@@ -32,18 +32,17 @@ const userSchema = new Schema(
     coverImage: {
       type: String, // Cloudinary url
     },
-    watchHistory: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Video",
-      },
-    ],
     password: {
       type: String,
       required: [true, "Password is required"],
     },
     refreshToken: {
       type: String,
+    },
+    role: {
+      type: String,
+      enum: ["user", "admin"], // Role field with predefined values
+      default: "user", // Default role is user
     },
   },
   {
@@ -71,6 +70,7 @@ userSchema.methods.generateAccessToken = function () {
       email: this.email,
       username: this.username,
       fullName: this.fullName,
+      role: this.role, // Include role in the access token
     },
     `${process.env.ACCESS_TOKEN_SECRET}`,
     {
@@ -78,7 +78,8 @@ userSchema.methods.generateAccessToken = function () {
     }
   );
 };
-// Generate // This Will Run More Times
+
+// Generate Refresh Token
 userSchema.methods.generateRefreshToken = function () {
   return jwt.sign(
     {
