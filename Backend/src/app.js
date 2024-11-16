@@ -30,6 +30,6 @@ import userRouter from "./routes/user.routes.js";
 import carRoutes from "./routes/car.routes.js";
 // Routes Declaration
 app.use("/api/v1/users", userRouter);
-app.use("/api/v1/cars", carRoutes); // Mount car routes at `/api/v1/cars`
+app.use("/api/v1/cars", carRoutes);
 
 export default app;

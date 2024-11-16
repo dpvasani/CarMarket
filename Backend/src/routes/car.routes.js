@@ -1,4 +1,3 @@
-// routes/carRoutes.js
 const express = require("express");
 const router = express.Router();
 const { verifyJWT, isAdmin } = require("../middlewares/authMiddleware");

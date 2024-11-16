@@ -1,4 +1,3 @@
-// controllers/carController.js
 const Car = require("../models/Car");
 const cloudinary = require("../utils/cloudinary");
 
