@@ -26,19 +26,10 @@ app.listen(process.env.PORT || 4000, () => {
 });
 
 // Routes Import
+import userRouter from "./routes/user.routes.js";
+import carRoutes from "./routes/car.routes.js";
+// Routes Declaration
+app.use("/api/v1/users", userRouter);
+app.use("/api/v1/cars", carRoutes); // Mount car routes at `/api/v1/cars`
 
-//routes declaration
-
-// http://localhost:8000/api/v1/users/register
-
-// Testing Purpose
-// app.get("/", (req, res) => {
-//   res.send("Hello, World!");
-// });
-
-// Testing Purpose
-
-// app.get("/test", (req, res) => {
-//   res.send("Test route is working!");
-// });
 export default app;

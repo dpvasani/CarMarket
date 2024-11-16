@@ -60,8 +60,8 @@ JWT_SECRET=your-secret-key
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/dpvasani/Backend-Template.git
-   cd Backend-Template
+   git clone https://github.com/dpvasani/CarMarket.git
+   cd CarMarket
    ```
 
 2. Install dependencies:
