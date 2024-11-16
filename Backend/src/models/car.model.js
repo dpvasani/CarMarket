@@ -1,4 +1,7 @@
-const mongoose = require("mongoose");
+import mongoose, { Schema } from "mongoose";
+
+// Function to validate image array length
+const arrayLimit = (val) => val.length <= 10;
 
 const carSchema = new mongoose.Schema({
   title: { type: String, required: true },
@@ -19,9 +22,6 @@ const carSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now },
 });
 
-function arrayLimit(val) {
-  return val.length <= 10;
-}
 // Add a static method for search
 carSchema.statics.searchCars = async function (keyword) {
   return this.find({
@@ -33,4 +33,5 @@ carSchema.statics.searchCars = async function (keyword) {
   });
 };
 
-module.exports = mongoose.model("Car", carSchema);
+// Export the model using ES6 export syntax
+export default mongoose.model("Car", carSchema);

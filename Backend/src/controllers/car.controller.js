@@ -1,9 +1,8 @@
-const Car = require("../models/Car");
-const cloudinary = require("../utils/cloudinary");
+import Car from "../models/Car.js";
+import { uploadOnCloudinary, deleteOnCloudinary } from "../utils/cloudinary.js";
 
 // Add a new car
-// Add a new car
-exports.addCar = async (data, ownerId) => {
+export const addCar = async (data, ownerId) => {
   const { title, description, tags, images } = data;
 
   if (!title || !description) {
@@ -20,7 +19,7 @@ exports.addCar = async (data, ownerId) => {
 
   // Upload images to Cloudinary
   const uploadedImages = await Promise.all(
-    images.map((image) => cloudinary.uploadOnCloudinary(image))
+    images.map((image) => uploadOnCloudinary(image))
   );
 
   const car = new Car({
@@ -28,23 +27,24 @@ exports.addCar = async (data, ownerId) => {
     description,
     tags,
     images: uploadedImages,
-    owner: ownerId,
+    createdBy: ownerId,
   });
 
   return car.save();
 };
+
 // Get all cars for a specific admin
-exports.getAllCarsByOwner = async (ownerId) => {
-  return Car.find({ owner: ownerId });
+export const getAllCarsByOwner = async (ownerId) => {
+  return Car.find({ createdBy: ownerId });
 };
 
 // Search cars globally
-exports.searchCars = async (keyword) => {
+export const searchCars = async (keyword) => {
   return Car.searchCars(keyword);
 };
 
 // Get car by ID
-exports.getCarById = async (carId) => {
+export const getCarById = async (carId) => {
   const car = await Car.findById(carId);
   if (!car) {
     throw new Error("Car not found.");
@@ -53,8 +53,8 @@ exports.getCarById = async (carId) => {
 };
 
 // Update car details
-exports.updateCar = async (carId, updateData, ownerId) => {
-  const car = await Car.findOne({ _id: carId, owner: ownerId });
+export const updateCar = async (carId, updateData, ownerId) => {
+  const car = await Car.findOne({ _id: carId, createdBy: ownerId });
   if (!car) {
     throw new Error("Unauthorized or Car not found.");
   }
@@ -62,7 +62,7 @@ exports.updateCar = async (carId, updateData, ownerId) => {
   // If images are provided, upload new images
   if (updateData.images) {
     const uploadedImages = await Promise.all(
-      updateData.images.map((image) => cloudinary.uploadOnCloudinary(image))
+      updateData.images.map((image) => uploadOnCloudinary(image))
     );
     updateData.images = uploadedImages;
   }
@@ -71,16 +71,14 @@ exports.updateCar = async (carId, updateData, ownerId) => {
 };
 
 // Delete a car
-exports.deleteCar = async (carId, ownerId) => {
-  const car = await Car.findOne({ _id: carId, owner: ownerId });
+export const deleteCar = async (carId, ownerId) => {
+  const car = await Car.findOne({ _id: carId, createdBy: ownerId });
   if (!car) {
     throw new Error("Unauthorized or Car not found.");
   }
 
   // Delete images from Cloudinary
-  await Promise.all(
-    car.images.map((image) => cloudinary.deleteOnCloudinary(image))
-  );
+  await Promise.all(car.images.map((image) => deleteOnCloudinary(image)));
 
   return Car.findByIdAndDelete(carId);
 };

@@ -7,6 +7,7 @@ import dotenv from "dotenv";
 // Load environment variables
 dotenv.config();
 
+// Verify JWT Middleware
 export const verifyJWT = asyncHandler(async (req, res, next) => {
   try {
     // Extract token from cookies or Authorization header
@@ -42,4 +43,14 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
     // Handle invalid token or verification failure
     next(new ApiError(401, error.message || "Invalid Access Token"));
   }
+});
+
+// isAdmin Middleware
+export const isAdmin = asyncHandler(async (req, res, next) => {
+  // Check if the user has an 'admin' role
+  if (req.user.role !== "admin") {
+    return next(new ApiError(403, "Access denied. Admins only."));
+  }
+  // If the user is an admin, proceed to the next middleware or route handler
+  next();
 });

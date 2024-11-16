@@ -1,27 +1,33 @@
-const express = require("express");
+import express from "express";
+import { verifyJWT, isAdmin } from "../middlewares/authMiddleware.js";
+import carController from "../controllers/carController.js";
+
 const router = express.Router();
-const { verifyJWT, isAdmin } = require("../middlewares/authMiddleware");
-const carController = require("../controllers/carController");
+
+// Helper function to handle errors
+const handleError = (res, error) => {
+  res.status(400).json({ error: error.message || "Something went wrong" });
+};
 
 // Add a car (Admin Only)
 router.post("/", verifyJWT, isAdmin, async (req, res) => {
+  const { title, description, tags, images } = req.body;
+
+  if (!title || !description || !images) {
+    return res
+      .status(400)
+      .json({ error: "Title, description, and images are required." });
+  }
+
+  if (images.length > 10) {
+    return res.status(400).json({ error: "Maximum of 10 images allowed." });
+  }
+
   try {
-    const { title, description, tags, images } = req.body;
-
-    if (!title || !description || !images) {
-      return res
-        .status(400)
-        .json({ error: "Title, description, and images are required." });
-    }
-
-    if (images.length > 10) {
-      return res.status(400).json({ error: "Maximum of 10 images allowed." });
-    }
-
     const car = await carController.addCar(req.body, req.user.id);
     res.status(201).json({ message: "Car added successfully.", car });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    handleError(res, error);
   }
 });
 
@@ -31,7 +37,7 @@ router.get("/", verifyJWT, isAdmin, async (req, res) => {
     const cars = await carController.getAllCarsByOwner(req.user.id);
     res.status(200).json(cars);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    handleError(res, error);
   }
 });
 
@@ -41,7 +47,7 @@ router.get("/search", verifyJWT, async (req, res) => {
     const cars = await carController.searchCars(req.query.keyword);
     res.status(200).json(cars);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    handleError(res, error);
   }
 });
 
@@ -51,7 +57,7 @@ router.get("/:id", verifyJWT, async (req, res) => {
     const car = await carController.getCarById(req.params.id);
     res.status(200).json(car);
   } catch (error) {
-    res.status(404).json({ error: error.message });
+    res.status(404).json({ error: "Car not found." });
   }
 });
 
@@ -65,7 +71,7 @@ router.patch("/:id", verifyJWT, isAdmin, async (req, res) => {
     );
     res.status(200).json({ message: "Car updated successfully.", updatedCar });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    handleError(res, error);
   }
 });
 
@@ -75,8 +81,8 @@ router.delete("/:id", verifyJWT, isAdmin, async (req, res) => {
     await carController.deleteCar(req.params.id, req.user.id);
     res.status(200).json({ message: "Car deleted successfully." });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    handleError(res, error);
   }
 });
 
-module.exports = router;
+export default router;
